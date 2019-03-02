@@ -1,12 +1,16 @@
-gulp-extract-media-queries2
+gulp-media-query-separate
 --------------------------
 Plugin extracts css rules inside of media queries and saves it to separated files.
+
+INSTALL
+-------
+`npm install --save-dev git+https://github.com/groovenectar/gulp-media-query-separate.git`
 
 EXAMPLE
 -------
 ```js
 var gulp = require("gulp");
-var extractMedia = require('gulp-extract-media-queries');
+var extractMedia = require('gulp-media-query-separate');
 
 gulp.task("design.build", function() {
 	gulp.src("src/design/style.css")
