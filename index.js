@@ -9,31 +9,31 @@ var pathjoin = require('path').join;
 var basename = require('path').basename;
 
 module.exports = function (filter) {
-	return through.obj(function (file, enc, callback) {
+	return through.obj(function (cssFile, characterEncoding, callback) {
 		var stream = this;
-		var fileName = basename(file.path, '.css');
-		var reworkData = rework(file.contents.toString()).use(reworkMoveMedia());
+		var fileName = basename(cssFile.path, '.css');
+		var reworkData = rework(cssFile.contents.toString()).use(reworkMoveMedia());
 		var stylesheets = split(reworkData);
 		var stylesheetKeys = Object.keys(stylesheets);
 
-		stylesheetKeys.forEach(function (key) {
+		stylesheetKeys.forEach(function (mediaQuery) {
 			// Replace 兼容 min-width:768px 之类冒号后边没有空格的写法
-			var name = cleanUpString(key.replace(/:\s?/g, '-'));
+			var mediaQueryStringId = cleanUpString(mediaQuery.replace(/:\s?/g, '-'));
 
-			if (typeof filter === 'function' && !filter(fileName, name)) return
+			if (typeof filter === 'function' && !filter(fileName, mediaQueryStringId)) return
 
-			var fileClone = file.clone({
+			var fileClone = cssFile.clone({
 				contents: false
 			});
 
-			var contents = stringify(stylesheets[key]);
+			var contents = stringify(stylesheets[mediaQuery]);
 			fileClone.contents = new Buffer(contents);
 
-			if (name) {
-				name = fileName + '-' + name;
-				fileClone.path = pathjoin(dirname(file.path), name + '.css');
+			if (mediaQueryStringId) {
+				mediaQueryStringId = fileName + '-' + mediaQueryStringId;
+				fileClone.path = pathjoin(dirname(cssFile.path), mediaQueryStringId + '.css');
 			} else {
-				fileClone.path = pathjoin(dirname(file.path), fileName + '-lite.css');
+				fileClone.path = pathjoin(dirname(cssFile.path), fileName + '-lite.css');
 			}
 
 			stream.push(fileClone);
